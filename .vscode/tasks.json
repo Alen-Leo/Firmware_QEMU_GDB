@@ -1,0 +1,20 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run_QEMU",
+            "type": "shell",
+            "command": "qemu-system-aarch64 -machine virt -cpu cortex-a53 -smp 1 -m 2G -kernel ./build/linux-5.15.10/arch/arm64/boot/Image -initrd ./build/busybox-1.32.1/_install/rootfs.img -append \"nokaslr console=ttyAMA0\" -nographic -S -s",
+            // "command": "bash run.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": true,
+            "problemMatcher": [],
+            "detail": "Run QEMU virtual machine",
+        }
+    ]
+}

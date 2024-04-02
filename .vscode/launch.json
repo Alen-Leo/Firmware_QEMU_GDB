@@ -1,0 +1,46 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "QEMU_GDB",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/linux-5.15.10/vmlinux",
+      "stopAtEntry": true,
+      "MIMode": "gdb",
+      "preLaunchTask": "Run_QEMU",
+      "miDebuggerPath": "/usr/bin/gdb-multiarch",
+      "miDebuggerServerAddress": "127.0.0.1:1234",
+      "hardwareBreakpoints": {
+        "require": true,
+        "limit": 100
+      },
+      "cwd": "${workspaceFolder}/linux-5.15.10",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "disable the user confirm",
+          "text": "set confirm off",
+          "ignoreFailures": true
+        },
+        // {
+        //   "description": "run the gdb debug scripts",
+        //   "text": "source ...",
+        //   "ignoreFailures": false
+        // },
+        {
+          "description": "enable the user confirm",
+          "text": "set confirm on",
+          "ignoreFailures": true
+        },
+      ]
+    }
+  ]
+}
