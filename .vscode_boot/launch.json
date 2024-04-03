@@ -1,0 +1,55 @@
+{
+        // Use IntelliSense to learn about possible attributes.
+        // Hover to view descriptions of existing attributes.
+        // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+        "version": "0.2.0",
+        "configurations": [
+                {
+                        "name": "QEMU_GDB",
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "program": "${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl1/bl1.elf",
+                        "stopAtConnect": true,
+                        "serverLaunchTimeout": "100000",
+                        "cwd": "${fileDirname}",
+                        "environment": [],
+                        "preLaunchTask": "run_qemu",
+                        "MIMode": "gdb",
+                        "targetArchitecture": "arm64",
+                        "miDebuggerPath": "/usr/bin/gdb-multiarch",
+                        "miDebuggerServerAddress": "localhost:1234",
+                        // "hardwareBreakpoints": {
+                        //         "require": true,
+                        //         "limit": 100
+                        // },
+                        "externalConsole": false,
+                        "setupCommands": [
+                                {
+                                        "description": "Enable pretty-printing for gdb",
+                                        "text": "-enable-pretty-printing",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add bl1",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl1/bl1.elf",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add bl2",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl2/bl2.elf",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add bl31",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl31/bl31.elf",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add bl31",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/Build/SbsaQemu/DEBUG_GCC5/AARCH64/OvmfPkg/QemuVideoDxe/QemuVideoDxe/DEBUG/QemuVideoDxe.dll 0x1003B753000",
+                                        "ignoreFailures": true
+                                },
+                        ]
+                },
+        ]
+}
