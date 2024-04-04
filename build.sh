@@ -5,6 +5,7 @@ export WORKSPACE=$(pwd)
 
 # 设置包路径
 export PACKAGES_PATH="${WORKSPACE}/edk2:${WORKSPACE}/edk2-platforms:${WORKSPACE}/edk2-non-osi"
+export CONF_PATH="${WORKSPACE}/edk2/BaseTools/Conf"
 
 # UEFI构建函数
 function build_uefi() {
@@ -86,8 +87,8 @@ function generate_sbsaqemu_bios() {
 function run_qemu() {
   qemu-system-aarch64 -m 1024 -M sbsa-ref \
   -pflash SBSA_FLASH0.fd -pflash SBSA_FLASH1.fd \
-  -serial file:./qemu_serial.log -s -S \
-  -device virtio-gpu-pci -device usb-kbd
+  -device usb-mouse -device usb-kbd \
+  -serial file:./qemu_serial.log -s -S
 }
 
 function build_qemu() {
