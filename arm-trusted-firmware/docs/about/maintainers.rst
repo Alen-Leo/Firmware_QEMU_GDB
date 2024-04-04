@@ -524,13 +524,12 @@ Arm Reference Design platform ports
 :|G|: `thomas-arm`_
 :|M|: Vijayenthiran Subramaniam <vijayenthiran.subramaniam@arm.com>
 :|G|: `vijayenthiran-arm`_
-:|F|: plat/arm/css/sgi/
-:|F|: plat/arm/board/rde1edge/
-:|F|: plat/arm/board/rdn1edge/
-:|F|: plat/arm/board/rdn2/
-:|F|: plat/arm/board/rdv1/
-:|F|: plat/arm/board/rdv1mc/
-:|F|: plat/arm/board/sgi575/
+:|F|: plat/arm/board/neoverse_rd/common
+:|F|: plat/arm/board/neoverse_rd/platform/rdn1edge/
+:|F|: plat/arm/board/neoverse_rd/platform/rdn2/
+:|F|: plat/arm/board/neoverse_rd/platform/rdv1/
+:|F|: plat/arm/board/neoverse_rd/platform/rdv1mc/
+:|F|: plat/arm/board/neoverse_rd/platform/sgi575/
 
 Arm Total Compute platform port
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -645,6 +644,13 @@ NXP i.MX8M platform port
 :|G|: `JackyBai`_
 :|F|: docs/plat/imx8m.rst
 :|F|: plat/imx/imx8m/
+
+NXP i.MX8ULP platform port
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+:|M|: Jacky Bai <ping.bai@nxp.com>
+:|G|: `JackyBai`_
+:|F|: docs/plat/imx8ulp.rst
+:|F|: plat/imx/imx8ulp/
 
 NXP i.MX9 platform port
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -811,6 +817,8 @@ Synquacer platform port
 ^^^^^^^^^^^^^^^^^^^^^^^
 :|M|: Sumit Garg <sumit.garg@linaro.org>
 :|G|: `b49020`_
+:|M|: Masahisa Kojima <kojima.masahisa@socionext.com>
+:|G|: `masahisak`_
 :|F|: docs/plat/synquacer.rst
 :|F|: plat/socionext/synquacer/
 
@@ -970,6 +978,7 @@ Conventional Changelog Extensions
 .. _lachitp: https://github.com/lachitp
 .. _marex: https://github.com/marex
 .. _masahir0y: https://github.com/masahir0y
+.. _masahisak: https://github.com/masahisak
 .. _michalsimek: https://github.com/michalsimek
 .. _mmind: https://github.com/mmind
 .. _MrVan: https://github.com/MrVan

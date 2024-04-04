@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2014-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -98,6 +98,17 @@
 					FVP_DTB_DRAM_MAP_START,		\
 					FVP_DTB_DRAM_MAP_SIZE,		\
 					MT_MEMORY | MT_RO | MT_NS)
+
+/*
+ * On the FVP platform when using the EL3 SPMC implementation allocate the
+ * datastore for tracking shared memory descriptors in the TZC DRAM section
+ * to ensure sufficient storage can be allocated.
+ * Provide an implementation of the accessor method to allow the datastore
+ * details to be retrieved by the SPMC.
+ * The SPMC will take care of initializing the memory region.
+ */
+
+#define PLAT_SPMC_SHMEM_DATASTORE_SIZE 512 * 1024
 
 #if SPMC_AT_EL3
 /*
@@ -234,7 +245,13 @@ defined(IMAGE_BL2) && MEASURED_BOOT
 /* When ARM_BL31_IN_DRAM is set, BL2 can use almost all of Trusted SRAM. */
 # define PLAT_ARM_MAX_BL2_SIZE	(UL(0x1F000) - FVP_BL2_ROMLIB_OPTIMIZATION)
 #else
-# define PLAT_ARM_MAX_BL2_SIZE	(UL(0x13000) - FVP_BL2_ROMLIB_OPTIMIZATION)
+/**
+ * Default to just under half of SRAM to ensure there's enough room for really
+ * large BL31 build configurations when using the default SRAM size (256 Kb).
+ */
+#define PLAT_ARM_MAX_BL2_SIZE                                               \
+	(((PLAT_ARM_TRUSTED_SRAM_SIZE / 3) & ~PAGE_SIZE_MASK) - PAGE_SIZE - \
+	 FVP_BL2_ROMLIB_OPTIMIZATION)
 #endif
 
 #if RESET_TO_BL31
@@ -416,7 +433,7 @@ defined(IMAGE_BL2) && MEASURED_BOOT
 #define PLAT_SDEI_DP_EVENT_MAX_CNT	ARM_SDEI_DP_EVENT_MAX_CNT
 #define PLAT_SDEI_DS_EVENT_MAX_CNT	ARM_SDEI_DS_EVENT_MAX_CNT
 #else
-  #if PLATFORM_TEST_RAS_FFH
+  #if PLATFORM_TEST_RAS_FFH || PLATFORM_TEST_FFH_LSP_RAS_SP
   #define PLAT_ARM_PRIVATE_SDEI_EVENTS \
 	ARM_SDEI_PRIVATE_EVENTS, \
 	SDEI_EXPLICIT_EVENT(5000, SDEI_MAPF_NORMAL), \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -325,12 +325,9 @@ void arm_bl31_platform_setup(void)
 /*******************************************************************************
  * Perform any BL31 platform runtime setup prior to BL31 exit common to ARM
  * standard platforms
- * Perform BL31 platform setup
  ******************************************************************************/
 void arm_bl31_plat_runtime_setup(void)
 {
-	console_switch_state(CONSOLE_FLAG_RUNTIME);
-
 	/* Initialize the runtime console */
 	arm_console_runtime_init();
 
@@ -394,6 +391,9 @@ void __init bl31_platform_setup(void)
 void bl31_plat_runtime_setup(void)
 {
 	arm_bl31_plat_runtime_setup();
+
+	console_flush();
+	console_switch_state(CONSOLE_FLAG_RUNTIME);
 }
 
 /*******************************************************************************

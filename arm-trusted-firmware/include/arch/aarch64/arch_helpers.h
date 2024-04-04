@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2013-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -241,6 +241,7 @@ DEFINE_SYSOP_PARAM_FUNC(xpaci)
 
 void flush_dcache_range(uintptr_t addr, size_t size);
 void flush_dcache_to_popa_range(uintptr_t addr, size_t size);
+void flush_dcache_to_popa_range_mte2(uintptr_t addr, size_t size);
 void clean_dcache_range(uintptr_t addr, size_t size);
 void inv_dcache_range(uintptr_t addr, size_t size);
 bool is_dcache_enabled(void);
@@ -271,6 +272,7 @@ DEFINE_IDREG_READ_FUNC(id_aa64pfr0_el1)
 DEFINE_IDREG_READ_FUNC(id_aa64pfr1_el1)
 DEFINE_RENAME_IDREG_READ_FUNC(id_aa64pfr2_el1, ID_AA64PFR2_EL1)
 DEFINE_IDREG_READ_FUNC(id_aa64dfr0_el1)
+DEFINE_IDREG_READ_FUNC(id_aa64dfr1_el1)
 DEFINE_IDREG_READ_FUNC(id_afr0_el1)
 DEFINE_SYSREG_READ_FUNC(CurrentEl)
 DEFINE_SYSREG_READ_FUNC(ctr_el0)
@@ -464,6 +466,9 @@ DEFINE_SYSREG_RW_FUNCS(cntp_tval_el0)
 DEFINE_SYSREG_RW_FUNCS(cntp_cval_el0)
 DEFINE_SYSREG_READ_FUNC(cntpct_el0)
 DEFINE_SYSREG_RW_FUNCS(cnthctl_el2)
+DEFINE_SYSREG_RW_FUNCS(cntv_ctl_el0)
+DEFINE_SYSREG_RW_FUNCS(cntv_cval_el0)
+DEFINE_SYSREG_RW_FUNCS(cntkctl_el1)
 
 DEFINE_SYSREG_RW_FUNCS(vtcr_el2)
 
@@ -480,6 +485,9 @@ DEFINE_SYSREG_RW_FUNCS(vtcr_el2)
 #define clr_cntp_ctl_enable(x)  ((x) &= ~(U(1) << CNTP_CTL_ENABLE_SHIFT))
 #define clr_cntp_ctl_imask(x)   ((x) &= ~(U(1) << CNTP_CTL_IMASK_SHIFT))
 
+DEFINE_SYSREG_RW_FUNCS(tpidr_el0)
+DEFINE_SYSREG_RW_FUNCS(tpidr_el1)
+DEFINE_SYSREG_RW_FUNCS(tpidr_el2)
 DEFINE_SYSREG_RW_FUNCS(tpidr_el3)
 
 DEFINE_SYSREG_RW_FUNCS(cntvoff_el2)
@@ -489,7 +497,7 @@ DEFINE_SYSREG_RW_FUNCS(vmpidr_el2)
 
 DEFINE_SYSREG_RW_FUNCS(hacr_el2)
 DEFINE_SYSREG_RW_FUNCS(hpfar_el2)
-DEFINE_SYSREG_RW_FUNCS(tpidr_el2)
+
 DEFINE_SYSREG_RW_FUNCS(dbgvcr32_el2)
 DEFINE_RENAME_SYSREG_RW_FUNCS(ich_hcr_el2, ICH_HCR_EL2)
 DEFINE_RENAME_SYSREG_RW_FUNCS(ich_vmcr_el2, ICH_VMCR_EL2)
@@ -500,6 +508,16 @@ DEFINE_SYSREG_RW_FUNCS(mdcr_el2)
 DEFINE_SYSREG_RW_FUNCS(mdcr_el3)
 DEFINE_SYSREG_RW_FUNCS(hstr_el2)
 DEFINE_SYSREG_RW_FUNCS(pmcr_el0)
+
+DEFINE_SYSREG_RW_FUNCS(csselr_el1)
+DEFINE_SYSREG_RW_FUNCS(tpidrro_el0)
+DEFINE_SYSREG_RW_FUNCS(contextidr_el1)
+DEFINE_SYSREG_RW_FUNCS(spsr_abt)
+DEFINE_SYSREG_RW_FUNCS(spsr_und)
+DEFINE_SYSREG_RW_FUNCS(spsr_irq)
+DEFINE_SYSREG_RW_FUNCS(spsr_fiq)
+DEFINE_SYSREG_RW_FUNCS(dacr32_el2)
+DEFINE_SYSREG_RW_FUNCS(ifsr32_el2)
 
 /* GICv3 System Registers */
 
@@ -629,6 +647,7 @@ DEFINE_RENAME_SYSREG_RW_FUNCS(por_el2, POR_EL2)
 /* FEAT_GCS Registers */
 DEFINE_RENAME_SYSREG_RW_FUNCS(gcscr_el2, GCSCR_EL2)
 DEFINE_RENAME_SYSREG_RW_FUNCS(gcspr_el2, GCSPR_EL2)
+DEFINE_RENAME_SYSREG_RW_FUNCS(gcscr_el1, GCSCR_EL1)
 
 /* DynamIQ Shared Unit power management */
 DEFINE_RENAME_SYSREG_RW_FUNCS(clusterpwrdn_el1, CLUSTERPWRDN_EL1)

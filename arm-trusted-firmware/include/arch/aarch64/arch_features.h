@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023, Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2024, Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -42,6 +42,11 @@ static inline bool is_armv7_gentimer_present(void)
 
 CREATE_FEATURE_FUNCS(feat_pan, id_aa64mmfr1_el1, ID_AA64MMFR1_EL1_PAN_SHIFT,
 		     ENABLE_FEAT_PAN)
+static inline bool is_feat_pan_present(void)
+{
+	return read_feat_pan_id_field() != 0U;
+}
+
 CREATE_FEATURE_FUNCS(feat_vhe, id_aa64mmfr1_el1, ID_AA64MMFR1_EL1_VHE_SHIFT,
 		     ENABLE_FEAT_VHE)
 
@@ -49,6 +54,12 @@ static inline bool is_armv8_2_ttcnp_present(void)
 {
 	return ((read_id_aa64mmfr2_el1() >> ID_AA64MMFR2_EL1_CNP_SHIFT) &
 		ID_AA64MMFR2_EL1_CNP_MASK) != 0U;
+}
+
+static inline bool is_feat_uao_present(void)
+{
+	return ((read_id_aa64mmfr2_el1() >> ID_AA64MMFR2_EL1_UAO_SHIFT) &
+		ID_AA64MMFR2_EL1_UAO_MASK) != 0U;
 }
 
 static inline bool is_feat_pacqarma3_present(void)
@@ -94,15 +105,49 @@ static inline unsigned int get_armv8_5_mte_support(void)
 	return ((read_id_aa64pfr1_el1() >> ID_AA64PFR1_EL1_MTE_SHIFT) &
 		ID_AA64PFR1_EL1_MTE_MASK);
 }
+static inline unsigned int is_feat_mte2_present(void)
+{
+	return get_armv8_5_mte_support() >= MTE_IMPLEMENTED_ELX;
+}
 
+static inline bool is_feat_ssbs_present(void)
+{
+	return ((read_id_aa64pfr1_el1() >> ID_AA64PFR1_EL1_SSBS_SHIFT) &
+		ID_AA64PFR1_EL1_SSBS_MASK) != SSBS_UNAVAILABLE;
+}
+
+static inline bool is_feat_nmi_present(void)
+{
+	return ((read_id_aa64pfr1_el1() >> ID_AA64PFR1_EL1_NMI_SHIFT) &
+		ID_AA64PFR1_EL1_NMI_MASK) == NMI_IMPLEMENTED;
+}
+
+static inline bool is_feat_gcs_present(void)
+{
+	return ((read_id_aa64pfr1_el1() >> ID_AA64PFR1_EL1_GCS_SHIFT) &
+		ID_AA64PFR1_EL1_GCS_MASK) == GCS_IMPLEMENTED;
+}
+
+static inline bool is_feat_ebep_present(void)
+{
+	return ((read_id_aa64dfr1_el1() >> ID_AA64DFR1_EBEP_SHIFT) &
+		ID_AA64DFR1_EBEP_MASK) == EBEP_IMPLEMENTED;
+}
+
+static inline bool is_feat_sebep_present(void)
+{
+	return ((read_id_aa64dfr0_el1() >> ID_AA64DFR0_SEBEP_SHIFT) &
+		ID_AA64DFR0_SEBEP_MASK) == SEBEP_IMPLEMENTED;
+}
+
+CREATE_FEATURE_FUNCS_VER(feat_mte2, get_armv8_5_mte_support, MTE_IMPLEMENTED_ELX,
+			 ENABLE_FEAT_MTE2)
 CREATE_FEATURE_FUNCS(feat_sel2, id_aa64pfr0_el1, ID_AA64PFR0_SEL2_SHIFT,
 		     ENABLE_FEAT_SEL2)
 CREATE_FEATURE_FUNCS(feat_twed, id_aa64mmfr1_el1, ID_AA64MMFR1_EL1_TWED_SHIFT,
 		     ENABLE_FEAT_TWED)
 CREATE_FEATURE_FUNCS(feat_fgt, id_aa64mmfr0_el1, ID_AA64MMFR0_EL1_FGT_SHIFT,
 		     ENABLE_FEAT_FGT)
-CREATE_FEATURE_FUNCS(feat_mte_perm, id_aa64pfr2_el1,
-		     ID_AA64PFR2_EL1_MTEPERM_SHIFT, ENABLE_FEAT_MTE_PERM)
 CREATE_FEATURE_FUNCS(feat_ecv, id_aa64mmfr0_el1, ID_AA64MMFR0_EL1_ECV_SHIFT,
 		     ENABLE_FEAT_ECV)
 CREATE_FEATURE_FUNCS_VER(feat_ecv_v2, read_feat_ecv_id_field,
@@ -191,10 +236,28 @@ static inline unsigned int read_feat_sb_id_field(void)
 	return ISOLATE_FIELD(read_id_aa64isar1_el1(), ID_AA64ISAR1_SB_SHIFT);
 }
 
-/* FEAT_CSV2_2: Cache Speculation Variant 2 */
-CREATE_FEATURE_FUNCS(feat_csv2, id_aa64pfr0_el1, ID_AA64PFR0_CSV2_SHIFT, 0)
+/*
+ * FEAT_CSV2: Cache Speculation Variant 2. This checks bit fields[56-59]
+ * of id_aa64pfr0_el1 register and can be used to check for below features:
+ * FEAT_CSV2_2: Cache Speculation Variant CSV2_2.
+ * FEAT_CSV2_3: Cache Speculation Variant CSV2_3.
+ * 0b0000 - Feature FEAT_CSV2 is not implemented.
+ * 0b0001 - Feature FEAT_CSV2 is implemented, but FEAT_CSV2_2 and FEAT_CSV2_3
+ *          are not implemented.
+ * 0b0010 - Feature FEAT_CSV2_2 is implemented but FEAT_CSV2_3 is not
+ *          implemented.
+ * 0b0011 - Feature FEAT_CSV2_3 is implemented.
+ */
+static inline unsigned int read_feat_csv2_id_field(void)
+{
+	return (unsigned int)(read_id_aa64pfr0_el1() >>
+		ID_AA64PFR0_CSV2_SHIFT) & ID_AA64PFR0_CSV2_MASK;
+}
+
 CREATE_FEATURE_FUNCS_VER(feat_csv2_2, read_feat_csv2_id_field,
 			 ID_AA64PFR0_CSV2_2_SUPPORTED, ENABLE_FEAT_CSV2_2)
+CREATE_FEATURE_FUNCS_VER(feat_csv2_3, read_feat_csv2_id_field,
+			 ID_AA64PFR0_CSV2_3_SUPPORTED, ENABLE_FEAT_CSV2_3)
 
 /* FEAT_SPE: Statistical Profiling Extension */
 CREATE_FEATURE_FUNCS(feat_spe, id_aa64dfr0_el1, ID_AA64DFR0_PMS_SHIFT,

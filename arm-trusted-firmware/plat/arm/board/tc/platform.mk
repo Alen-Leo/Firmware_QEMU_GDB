@@ -1,61 +1,71 @@
-# Copyright (c) 2021-2023, Arm Limited. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
 include common/fdt_wrappers.mk
 
-ifeq ($(TARGET_PLATFORM), 0)
-	$(error Platform ${PLAT}$(TARGET_PLATFORM) is deprecated.)
+TARGET_FLAVOUR			:=	fvp
+# DPU with SCMI may not necessarily work, so allow its independence
+TC_DPU_USE_SCMI_CLK		:=	1
+# SCMI power domain control enable
+TC_SCMI_PD_CTRL_EN		:=	1
+# IOMMU: Enable the use of system or individual MMUs
+TC_IOMMU_EN			:=	1
+
+# System setup
+CSS_USE_SCMI_SDS_DRIVER		:=	1
+HW_ASSISTED_COHERENCY		:=	1
+USE_COHERENT_MEM		:=	0
+GIC_ENABLE_V4_EXTN		:=      1
+GICV3_SUPPORT_GIC600		:=	1
+override NEED_BL2U		:=	no
+override ARM_PLAT_MT		:=	1
+
+# CPU setup
+ARM_ARCH_MINOR			:=	7
+BRANCH_PROTECTION		:=	1
+ENABLE_FEAT_MPAM		:=	1 # default is 2, optimise
+ENABLE_SVE_FOR_NS		:=	2 # to show we use it
+ENABLE_SVE_FOR_SWD		:=	1
+ENABLE_TRBE_FOR_NS		:=	1
+ENABLE_SYS_REG_TRACE_FOR_NS	:=	1
+ENABLE_FEAT_AMU			:=	1
+ENABLE_AMU_FCONF		:=	1
+ENABLE_AMU_AUXILIARY_COUNTERS	:=	1
+ENABLE_MPMM			:=	1
+ENABLE_MPMM_FCONF		:=	1
+
+CTX_INCLUDE_AARCH32_REGS	:=	0
+
+ifeq (${SPD},spmd)
+	SPMD_SPM_AT_SEL2	:=	1
+	CTX_INCLUDE_PAUTH_REGS	:=	1
 endif
 
-ifeq ($(TARGET_PLATFORM), 1)
+
+ifneq ($(shell expr $(TARGET_PLATFORM) \<= 1), 0)
         $(warning Platform ${PLAT}$(TARGET_PLATFORM) is deprecated. \
           Some of the features might not work as expected)
 endif
 
-ifeq ($(shell expr $(TARGET_PLATFORM) \<= 2), 0)
-        $(error TARGET_PLATFORM must be less than or equal to 2)
+ifeq ($(shell expr $(TARGET_PLATFORM) \<= 3), 0)
+        $(error TARGET_PLATFORM must be less than or equal to 3)
 endif
 
-$(eval $(call add_define,TARGET_PLATFORM))
+ifeq ($(filter ${TARGET_FLAVOUR}, fvp fpga),)
+        $(error TARGET_FLAVOUR must be fvp or fpga)
+endif
+
+$(eval $(call add_defines, \
+	TARGET_PLATFORM \
+	TARGET_FLAVOUR_$(call uppercase,${TARGET_FLAVOUR}) \
+	TC_DPU_USE_SCMI_CLK \
+	TC_SCMI_PD_CTRL_EN \
+	TC_IOMMU_EN \
+))
 
 CSS_LOAD_SCP_IMAGES	:=	1
-
-CSS_USE_SCMI_SDS_DRIVER	:=	1
-
-ENABLE_FEAT_RAS		:=	1
-
-SDEI_SUPPORT		:=	0
-
-EL3_EXCEPTION_HANDLING	:=	0
-
-HANDLE_EA_EL3_FIRST_NS	:=	0
-
-# System coherency is managed in hardware
-HW_ASSISTED_COHERENCY	:=	1
-
-# When building for systems with hardware-assisted coherency, there's no need to
-# use USE_COHERENT_MEM. Require that USE_COHERENT_MEM must be set to 0 too.
-USE_COHERENT_MEM	:=	0
-
-GIC_ENABLE_V4_EXTN	:=      1
-
-# GIC-600 configuration
-GICV3_SUPPORT_GIC600	:=	1
-
-# Enable SVE
-ENABLE_SVE_FOR_NS	:=	2
-ENABLE_SVE_FOR_SWD	:=	1
-
-# enable trace buffer control registers access to NS by default
-ENABLE_TRBE_FOR_NS              := 1
-
-# enable trace system registers access to NS by default
-ENABLE_SYS_REG_TRACE_FOR_NS     := 1
-
-# enable trace filter control registers access to NS by default
-ENABLE_TRF_FOR_NS               := 1
 
 # Include GICv3 driver files
 include drivers/arm/gic/v3/gicv3.mk
@@ -64,13 +74,10 @@ ENT_GIC_SOURCES		:=	${GICV3_SOURCES}		\
 				plat/common/plat_gicv3.c	\
 				plat/arm/common/arm_gicv3.c
 
-override NEED_BL2U	:=	no
-
-override ARM_PLAT_MT	:=	1
-
 TC_BASE	=	plat/arm/board/tc
 
-PLAT_INCLUDES		+=	-I${TC_BASE}/include/
+PLAT_INCLUDES		+=	-I${TC_BASE}/include/ \
+				-I${TC_BASE}/fdts/
 
 # CPU libraries for TARGET_PLATFORM=1
 ifeq (${TARGET_PLATFORM}, 1)
@@ -84,6 +91,13 @@ ifeq (${TARGET_PLATFORM}, 2)
 TC_CPU_SOURCES	+=	lib/cpus/aarch64/cortex_a520.S \
 			lib/cpus/aarch64/cortex_a720.S \
 			lib/cpus/aarch64/cortex_x4.S
+endif
+
+# CPU libraries for TARGET_PLATFORM=3
+ifeq (${TARGET_PLATFORM}, 3)
+TC_CPU_SOURCES	+=	lib/cpus/aarch64/cortex_a520.S \
+			lib/cpus/aarch64/cortex_chaberton.S \
+			lib/cpus/aarch64/cortex_blackhawk.S
 endif
 
 INTERCONNECT_SOURCES	:=	${TC_BASE}/tc_interconnect.c
@@ -122,18 +136,22 @@ BL31_SOURCES		+=	${FDT_WRAPPERS_SOURCES}
 
 # Add the FDT_SOURCES and options for Dynamic Config
 FDT_SOURCES		+=	${TC_BASE}/fdts/${PLAT}_fw_config.dts	\
-				${TC_BASE}/fdts/${PLAT}_tb_fw_config.dts
+				${TC_BASE}/fdts/${PLAT}_tb_fw_config.dts \
+				${TC_BASE}/fdts/${PLAT}_nt_fw_config.dts
 FW_CONFIG		:=	${BUILD_PLAT}/fdts/${PLAT}_fw_config.dtb
 TB_FW_CONFIG		:=	${BUILD_PLAT}/fdts/${PLAT}_tb_fw_config.dtb
+FVP_NT_FW_CONFIG	:=	${BUILD_PLAT}/fdts/${PLAT}_nt_fw_config.dtb
 
 # Add the FW_CONFIG to FIP and specify the same to certtool
 $(eval $(call TOOL_ADD_PAYLOAD,${FW_CONFIG},--fw-config,${FW_CONFIG}))
 # Add the TB_FW_CONFIG to FIP and specify the same to certtool
 $(eval $(call TOOL_ADD_PAYLOAD,${TB_FW_CONFIG},--tb-fw-config,${TB_FW_CONFIG}))
+# Add the NT_FW_CONFIG to FIP and specify the same to certtool
+$(eval $(call TOOL_ADD_PAYLOAD,${FVP_NT_FW_CONFIG},--nt-fw-config,${FVP_NT_FW_CONFIG}))
 
 ifeq (${SPD},spmd)
 ifeq ($(ARM_SPMC_MANIFEST_DTS),)
-ARM_SPMC_MANIFEST_DTS	:=	${TC_BASE}/fdts/${PLAT}_spmc_manifest.dts
+ARM_SPMC_MANIFEST_DTS	:=	${TC_BASE}/fdts/${PLAT}_spmc_test_manifest.dts
 endif
 
 FDT_SOURCES		+=	${ARM_SPMC_MANIFEST_DTS}
@@ -152,43 +170,59 @@ $(eval TC_HW_CONFIG	:=	${BUILD_PLAT}/$(patsubst %.dts,%.dtb,$(TC_HW_CONFIG_DTS))
 # Add the HW_CONFIG to FIP and specify the same to certtool
 $(eval $(call TOOL_ADD_PAYLOAD,${TC_HW_CONFIG},--hw-config,${TC_HW_CONFIG}))
 
-override CTX_INCLUDE_AARCH32_REGS	:= 0
-
-override CTX_INCLUDE_PAUTH_REGS	:= 1
-
-override ENABLE_SPE_FOR_NS	:= 0
-
-override ENABLE_FEAT_AMU := 1
-override ENABLE_AMU_AUXILIARY_COUNTERS := 1
-override ENABLE_AMU_FCONF := 1
-
-override ENABLE_MPMM := 1
-override ENABLE_MPMM_FCONF := 1
-
 # Include Measured Boot makefile before any Crypto library makefile.
 # Crypto library makefile may need default definitions of Measured Boot build
 # flags present in Measured Boot makefile.
+$(info Including rss_comms.mk)
 ifeq (${MEASURED_BOOT},1)
-    MEASURED_BOOT_MK := drivers/measured_boot/rss/rss_measured_boot.mk
-    $(info Including ${MEASURED_BOOT_MK})
-    include ${MEASURED_BOOT_MK}
-    $(info Including rss_comms.mk)
-    include drivers/arm/rss/rss_comms.mk
+        $(info Including rss_comms.mk)
+        include drivers/arm/rss/rss_comms.mk
 
-    BL1_SOURCES		+=	${MEASURED_BOOT_SOURCES} \
+	BL1_SOURCES	+=	${RSS_COMMS_SOURCES}
+	BL2_SOURCES	+=	${RSS_COMMS_SOURCES}
+	PLAT_INCLUDES	+=	-Iinclude/lib/psa
+
+    ifeq (${DICE_PROTECTION_ENVIRONMENT},1)
+        $(info Including qcbor.mk)
+        include drivers/measured_boot/rss/qcbor.mk
+        $(info Including dice_prot_env.mk)
+        include drivers/measured_boot/rss/dice_prot_env.mk
+
+	BL1_SOURCES	+=	${QCBOR_SOURCES} \
+				${DPE_SOURCES} \
+				plat/arm/board/tc/tc_common_dpe.c \
+				plat/arm/board/tc/tc_bl1_dpe.c \
+				lib/psa/dice_protection_environment.c \
+				drivers/arm/css/sds/sds.c \
+				drivers/delay_timer/delay_timer.c \
+				drivers/delay_timer/generic_delay_timer.c
+
+	BL2_SOURCES	+=	${QCBOR_SOURCES} \
+				${DPE_SOURCES} \
+				plat/arm/board/tc/tc_common_dpe.c \
+				plat/arm/board/tc/tc_bl2_dpe.c \
+				lib/psa/dice_protection_environment.c
+
+	PLAT_INCLUDES	+=	-I${QCBOR_INCLUDES} \
+				-Iinclude/lib/dice
+    else
+        $(info Including rss_measured_boot.mk)
+        include drivers/measured_boot/rss/rss_measured_boot.mk
+
+	BL1_SOURCES	+=	${MEASURED_BOOT_SOURCES} \
 				plat/arm/board/tc/tc_common_measured_boot.c \
 				plat/arm/board/tc/tc_bl1_measured_boot.c \
-				lib/psa/measured_boot.c			 \
-				${RSS_COMMS_SOURCES}
+				lib/psa/measured_boot.c
 
-    BL2_SOURCES		+=	${MEASURED_BOOT_SOURCES} \
+	BL2_SOURCES		+=	${MEASURED_BOOT_SOURCES} \
 				plat/arm/board/tc/tc_common_measured_boot.c \
 				plat/arm/board/tc/tc_bl2_measured_boot.c \
-				lib/psa/measured_boot.c			 \
-				${RSS_COMMS_SOURCES}
+				lib/psa/measured_boot.c
+    endif
+endif
 
-PLAT_INCLUDES		+=	-Iinclude/lib/psa
-
+ifeq (${TRNG_SUPPORT},1)
+	BL31_SOURCES	+=	plat/arm/board/tc/tc_trng.c
 endif
 
 ifneq (${PLATFORM_TEST},)

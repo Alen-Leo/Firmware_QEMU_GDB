@@ -18,6 +18,7 @@
 #include <common/runtime_svc.h>
 #include <drivers/console.h>
 #include <lib/bootmarker_capture.h>
+#include <lib/el3_runtime/context_debug.h>
 #include <lib/el3_runtime/context_mgmt.h>
 #include <lib/pmf/pmf.h>
 #include <lib/runtime_instr.h>
@@ -82,7 +83,7 @@ uintptr_t get_arm_std_svc_args(unsigned int svc_mask)
 /*******************************************************************************
  * Simple function to initialise all BL31 helper libraries.
  ******************************************************************************/
-void __init bl31_lib_init(void)
+static void __init bl31_lib_init(void)
 {
 	cm_init();
 }
@@ -106,6 +107,9 @@ void bl31_setup(u_register_t arg0, u_register_t arg1, u_register_t arg2,
 	 */
 	assert(is_armv8_3_pauth_present());
 #endif /* CTX_INCLUDE_PAUTH_REGS */
+
+	/* Prints context_memory allocated for all the security states */
+	report_ctx_memory_usage();
 }
 
 /*******************************************************************************

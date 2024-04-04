@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2016-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -68,6 +68,9 @@ ${1} : ${2}
 	-@if exist "$(tmp_dir)"  rd /Q /S "$(tmp_dir)"
     endef
 
+    nul := nul
+
+    which = $(shell where $(1) 2>$(nul))
 endif
 
 # Because git is not available from CMD.EXE, we need to avoid
@@ -85,8 +88,7 @@ VERSION_MESSAGE = const char version[] = "${VERSION}";
 define MAKE_BUILD_STRINGS
 	$$(file >$1.in,$$(TF_CFLAGS) $$(CFLAGS))
 	@echo $$(BUILT_TIME_DATE_STRING) $$(VERSION_STRING_MESSAGE) $$(VERSION_MESSAGE) | \
-		$$(CC) @$1.in -x c -c - -o $1
+		$($(ARCH)-cc) @$1.in -x c -c - -o $1
 endef
 
 MSVC_NMAKE := nmake.exe
-

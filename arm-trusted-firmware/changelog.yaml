@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023, Arm Limited. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -116,8 +116,11 @@ subsections:
       - title: Memory Partitioning and Monitoring (MPAM) Extension (FEAT_MPAM)
         scope: mpam
 
-      - title: Memory Tagging Extension
-        scope: mte
+      - title: Memory Tagging Extension2
+        scope: mte2
+
+        deprecated:
+          - mte
 
       - title: Pointer Authentication Extension
         scope: pauth
@@ -413,6 +416,9 @@ subsections:
               - title: i.MX 8
                 scope: imx8
 
+              - title: i.MX 8ULP
+                scope: imx8ulp
+
               - title: i.MX 9
                 scope: imx9
 
@@ -540,6 +546,9 @@ subsections:
 
           - title: Raspberry Pi 4
             scope: rpi4
+
+          - title: Raspberry Pi 5
+            scope: rpi5
 
       - title: Renesas
         scope: renesas
@@ -774,6 +783,9 @@ subsections:
       - title: PSCI
         scope: psci
 
+      - title: ROMlib
+        scope: romlib
+
       - title: GPT
         scope: gpt
 
@@ -797,6 +809,9 @@ subsections:
 
         deprecated:
           - lib/psa
+
+      - title: DICE Protection Environment
+        scope: dice
 
       - title: Context Management
         scope: context-mgmt
@@ -1368,6 +1383,9 @@ subsections:
 
         deprecated:
           - cert_create
+
+      - title: Marvell Tools
+        scope: marvell-tools
 
   - title: Dependencies
     scope: deps

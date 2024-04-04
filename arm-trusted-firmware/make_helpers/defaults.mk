@@ -176,6 +176,9 @@ endif
 # Option to build TF with Measured Boot support
 MEASURED_BOOT			:= 0
 
+# Option to enable the DICE Protection Environmnet as a Measured Boot backend
+DICE_PROTECTION_ENVIRONMENT	:=0
+
 # NS timer register save and restore
 NS_TIMER_SWITCH			:= 0
 
@@ -351,8 +354,13 @@ NR_OF_IMAGES_IN_FW_BANK		:= 1
 # Disable Firmware update support by default
 PSA_FWU_SUPPORT			:= 0
 
-# By default, disable the mocking of RSS provided services
-PLAT_RSS_NOT_SUPPORTED		:= 0
+# Enable image description in FWU metadata by default when PSA_FWU_SUPPORT
+# is enabled.
+ifeq ($(PSA_FWU_SUPPORT),1)
+PSA_FWU_METADATA_FW_STORE_DESC	:= 1
+else
+PSA_FWU_METADATA_FW_STORE_DESC	:= 0
+endif
 
 # Dynamic Root of Trust for Measurement support
 DRTM_SUPPORT			:= 0
@@ -377,3 +385,10 @@ ENABLE_CONSOLE_GETC		:= 0
 # functions must be enabled by platforms if they require it.
 # Disabled by default.
 INIT_UNUSED_NS_EL2		:= 0
+
+# Disable including MPAM EL2 registers in context by default since currently
+# it's only enabled for NS world
+CTX_INCLUDE_MPAM_REGS		:= 0
+
+# Enable context memory usage reporting during BL31 setup.
+PLATFORM_REPORT_CTX_MEM_USE	:= 0

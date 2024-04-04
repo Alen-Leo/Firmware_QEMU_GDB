@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Arm Limited. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -59,8 +59,10 @@ static uint8_t select_protocol_version(const psa_invec *in_vec, size_t in_len,
 	 * messages due to ATU configuration costs to allow access to the
 	 * pointers.
 	 */
-	if ((comms_embed_msg_min_size + in_size_total > comms_mhu_msg_size - sizeof(uint32_t))
-	 || (comms_embed_reply_min_size + out_size_total > comms_mhu_msg_size) - sizeof(uint32_t)) {
+	if ((comms_embed_msg_min_size + in_size_total >
+	     comms_mhu_msg_size - sizeof(uint32_t)) ||
+	    (comms_embed_reply_min_size + out_size_total >
+	     comms_mhu_msg_size - sizeof(uint32_t))) {
 		return RSS_COMMS_PROTOCOL_POINTER_ACCESS;
 	} else {
 		return RSS_COMMS_PROTOCOL_EMBED;
@@ -82,8 +84,8 @@ psa_status_t psa_call(psa_handle_t handle, int32_t type, const psa_invec *in_vec
 	psa_status_t return_val;
 	size_t idx;
 
-	if (type > INT16_MAX || type < INT16_MIN || in_len > PSA_MAX_IOVEC
-	    || out_len > PSA_MAX_IOVEC) {
+	if (type > PSA_CALL_TYPE_MAX || type < PSA_CALL_TYPE_MIN ||
+	    in_len > PSA_MAX_IOVEC   || out_len > PSA_MAX_IOVEC) {
 		return PSA_ERROR_INVALID_ARGUMENT;
 	}
 

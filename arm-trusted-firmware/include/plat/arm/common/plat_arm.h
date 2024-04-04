@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,6 +13,7 @@
 #include <lib/bakery_lock.h>
 #include <lib/cassert.h>
 #include <lib/el3_runtime/cpu_data.h>
+#include <lib/gpt_rme/gpt_rme.h>
 #include <lib/spinlock.h>
 #include <lib/utils_def.h>
 #include <lib/xlat_tables/xlat_tables_compat.h>
@@ -30,6 +31,17 @@ typedef struct arm_tzc_regions_info {
 	unsigned int sec_attr;
 	unsigned int nsaid_permissions;
 } arm_tzc_regions_info_t;
+
+typedef struct arm_gpt_info {
+	pas_region_t *pas_region_base;
+	unsigned int pas_region_count;
+	uintptr_t l0_base;
+	uintptr_t l1_base;
+	size_t l0_size;
+	size_t l1_size;
+	gpccr_pps_e pps;
+	gpccr_pgs_e pgs;
+} arm_gpt_info_t;
 
 /*******************************************************************************
  * Default mapping definition of the TrustZone Controller for ARM standard
@@ -278,6 +290,12 @@ void arm_bl1_set_mbedtls_heap(void);
 int arm_get_mbedtls_heap(void **heap_addr, size_t *heap_size);
 
 #if MEASURED_BOOT
+#if DICE_PROTECTION_ENVIRONMENT
+int arm_set_nt_fw_info(int *ctx_handle);
+int arm_set_tb_fw_info(int *ctx_handle);
+int arm_get_tb_fw_info(int *ctx_handle);
+#else
+/* Specific to event log backend */
 int arm_set_tos_fw_info(uintptr_t log_addr, size_t log_size);
 int arm_set_nt_fw_info(
 /*
@@ -292,6 +310,7 @@ int arm_set_tb_fw_info(uintptr_t log_addr, size_t log_size,
 		       size_t log_max_size);
 int arm_get_tb_fw_info(uint64_t *log_addr, size_t *log_size,
 		       size_t *log_max_size);
+#endif /* DICE_PROTECTION_ENVIRONMENT */
 #endif /* MEASURED_BOOT */
 
 /*
@@ -361,6 +380,9 @@ int plat_arm_get_alt_image_source(
 	uintptr_t *image_spec);
 unsigned int plat_arm_calc_core_pos(u_register_t mpidr);
 const mmap_region_t *plat_arm_get_mmap(void);
+
+const arm_gpt_info_t *plat_arm_get_gpt_info(void);
+void arm_gpt_setup(void);
 
 /* Allow platform to override psci_pm_ops during runtime */
 const plat_psci_ops_t *plat_arm_psci_override_pm_ops(plat_psci_ops_t *ops);

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2013-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -59,6 +59,10 @@ endif
 include lib/debugfs/debugfs.mk
 ifeq (${USE_DEBUGFS},1)
 	BL31_SOURCES	+= $(DEBUGFS_SRCS)
+endif
+
+ifeq (${PLATFORM_REPORT_CTX_MEM_USE},1)
+BL31_SOURCES		+=	lib/el3_runtime/aarch64/context_debug.c
 endif
 
 ifeq (${EL3_EXCEPTION_HANDLING},1)
@@ -157,11 +161,15 @@ BL31_SOURCES		+=	services/std_svc/drtm/drtm_main.c		\
 				${MBEDTLS_SOURCES}
 endif
 
+ifeq ($(CROS_WIDEVINE_SMC),1)
+BL31_SOURCES		+=	services/oem/chromeos/widevine_smc_handlers.c
+endif
+
 BL31_DEFAULT_LINKER_SCRIPT_SOURCE := bl31/bl31.ld.S
 
-ifneq ($(findstring gcc,$(notdir $(LD))),)
+ifeq ($($(ARCH)-ld-id),gnu-gcc)
         BL31_LDFLAGS	+=	-Wl,--sort-section=alignment
-else ifneq ($(findstring ld,$(notdir $(LD))),)
+else ifneq ($(filter llvm-lld gnu-ld,$($(ARCH)-ld-id)),)
         BL31_LDFLAGS	+=	--sort-section=alignment
 endif
 

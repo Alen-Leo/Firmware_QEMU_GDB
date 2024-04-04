@@ -27,6 +27,7 @@ Platform Ports
    warp7
    imx8
    imx8m
+   imx8ulp
    imx9
    npcm845x
    nxp/index
@@ -37,6 +38,7 @@ Platform Ports
    qti-msm8916
    rpi3
    rpi4
+   rpi5
    rcar-gen3
    rz-g2
    rockchip
@@ -59,7 +61,6 @@ documentation associated with them.
 
    - Arm Neoverse N1 System Development Platform (N1SDP)
    - Arm Neoverse Reference Design N1 Edge (RD-N1-Edge) FVP
-   - Arm Neoverse Reference Design E1 Edge (RD-E1-Edge) FVP
    - Arm SGI-575
    - MediaTek MT8173 SoCs
 
@@ -81,9 +82,9 @@ Deprecated platforms
 +----------------+----------------+--------------------+--------------------+
 |    tc1         |      Arm       |        2.10        |       TBD          |
 +----------------+----------------+--------------------+--------------------+
-|    rde1edge    |      Arm       |        2.9         |       3.0          |
+|    rde1edge    |      Arm       |        2.9         |       2.11         |
 +----------------+----------------+--------------------+--------------------+
 
 --------------
 
-*Copyright (c) 2019-2023, Arm Limited. All rights reserved.*
+*Copyright (c) 2019-2024, Arm Limited. All rights reserved.*
