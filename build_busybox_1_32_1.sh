@@ -7,12 +7,12 @@
 # Store the absolute path of the current directory
 current_dir=$(pwd)
 
-# Check if ".config" file exists in the "busybox-1.32.1" directory
-if [ -f "$current_dir/busybox-1.32.1/.config" ]; then
+# Check if ".config" file exists in the "build/busybox-1.36.1" directory
+if [ -f "$current_dir/build/busybox-1.36.1/.config" ]; then
   # Check the value of CONFIG_STATIC
-  if grep -q "^CONFIG_STATIC=y$" "$current_dir/busybox-1.32.1/.config"; then
+  if grep -q "^CONFIG_STATIC=y$" "$current_dir/build/busybox-1.36.1/.config"; then
     # Compile make command based on the number of available processors
-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) -C "$current_dir/busybox-1.32.1"
+    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) -C "$current_dir/busybox-1.36.1" O=$current_dir/build/busybox-1.36.1
     # Check the make exit code
     if [ $? -eq 0 ]; then
       echo "busybox compiled successfully."
@@ -20,7 +20,7 @@ if [ -f "$current_dir/busybox-1.32.1/.config" ]; then
       echo "Error: Failed to compile busybox."
       exit 1
     fi
-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C "$current_dir/busybox-1.32.1" install
+    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C "$current_dir/build/busybox-1.36.1" install O=$current_dir/build/busybox-1.36.1
     # Check the make exit code
     if [ $? -eq 0 ]; then
       echo "busybox compiled successfully."
@@ -33,13 +33,13 @@ if [ -f "$current_dir/busybox-1.32.1/.config" ]; then
     exit 1
   fi
 else
-  echo "Error: '.config' file not found in the 'busybox-1.32.1' directory."
-  echo "Try to run 'make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig' to generate the '.config' file."
+  echo "Error: '.config' file not found in the 'build/busybox-1.36.1' directory."
+  echo "Try to run 'make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig -C busybox-1.36.1 O=../build/busybox-1.36.1' to generate the '.config' file."
   exit 1
 fi
 
 # Change directory to "_install"
-cd "$current_dir/busybox-1.32.1/_install"
+cd "$current_dir/build/busybox-1.36.1/_install"
 
 # Execute commands in "_install" directory to generate "rootfs.img"
 mkdir -pv {proc,sys}
