@@ -8,7 +8,7 @@
       "name": "QEMU_GDB",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/linux-5.15.10/vmlinux",
+      "program": "${workspaceFolder}/linux-5.15.10/vmlinux",
       "stopAtEntry": true,
       "MIMode": "gdb",
       "preLaunchTask": "Run_QEMU",
