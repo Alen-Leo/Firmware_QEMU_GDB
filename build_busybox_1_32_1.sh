@@ -41,8 +41,7 @@ fi
 # Change directory to "_install"
 cd "$current_dir/busybox-1.32.1/_install"
 
-# Execute commands in "_install" directory
-
+# Execute commands in "_install" directory to generate "rootfs.img"
 mkdir -pv {proc,sys}
 find . | cpio -o --format=newc > ./rootfs.img
 
