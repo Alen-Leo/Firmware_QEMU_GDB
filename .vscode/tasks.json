@@ -6,7 +6,7 @@
         {
             "label": "Run_QEMU",
             "type": "shell",
-            "command": "qemu-system-aarch64 -machine virt -cpu cortex-a53 -smp 1 -m 2G -kernel ./linux-5.15.10/arch/arm64/boot/Image -initrd ./busybox-1.32.1/_install/rootfs.img -append \"nokaslr console=ttyAMA0\" -nographic -S -s",
+            "command": "qemu-system-aarch64 -machine virt -cpu cortex-a53 -smp 1 -m 2G -kernel ./build/linux-5.15.10/arch/arm64/boot/Image -initrd ./build/busybox-1.36.1/_install/rootfs.img -append \"nokaslr console=ttyAMA0\" -nographic -S -s",
             // "command": "bash run.sh",
             "group": {
                 "kind": "build",
