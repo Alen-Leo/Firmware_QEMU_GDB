@@ -12,9 +12,24 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "isBackground": true,
-            "problemMatcher": [],
             "detail": "Run QEMU virtual machine",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "GDB",
+                "fileLocation": "relative",
+                "pattern": {
+                    "regexp": "(.*)$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern":{
+                        "regexp": "Checking necessary files.*"
+                    },
+                    "endsPattern":{
+                        "regexp": "Running QEMU with GDB.*"
+                    }
+                },
+            }
         }
     ]
 }
