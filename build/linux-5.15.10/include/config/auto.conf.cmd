@@ -1397,7 +1397,7 @@ endif
 ifneq "$(LD)" "aarch64-linux-gnu-ld"
 include/config/auto.conf: FORCE
 endif
-ifneq "$(srctree)" "."
+ifneq "$(srctree)" "/home/alen/Code/test/Firmware_QEMU_GDB/linux-5.15.10"
 include/config/auto.conf: FORCE
 endif
 ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0"
