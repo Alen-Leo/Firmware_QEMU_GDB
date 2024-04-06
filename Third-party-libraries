@@ -1,0 +1,19 @@
+1.edk2 :
+sudo apt install build-essential uuid-dev iasl git nasm python-is-python3
+
+交叉编译器：
+sudo apt install gcc-aarch64-linux-gnu
+
+openssl:
+sudo apt install libssl-dev
+
+2.qemu:
+sudo apt install qemu-system-arm
+
+vgabios-stdvga.bin:
+apt-get install vgabios
+ln -s /usr/share/vgabios/vgabios.stdvga.bin /usr/share/qemu/vgabios-stdvga.bin
+
+3.gdb
+gdb-multiarch:
+sudo apt install gdb-multiarch
