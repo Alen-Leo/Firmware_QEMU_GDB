@@ -1,3 +1,4 @@
 Build/
 *.fd
 *.log
+edk2/BaseTools/Conf/*
