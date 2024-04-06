@@ -1,46 +1,98 @@
 {
-  // 使用 IntelliSense 了解相关属性。
-  // 悬停以查看现有属性的描述。
-  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "QEMU_GDB",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/linux-5.15.10/vmlinux",
-      "stopAtEntry": true,
-      "MIMode": "gdb",
-      "preLaunchTask": "Run_QEMU",
-      "miDebuggerPath": "/usr/bin/gdb-multiarch",
-      "miDebuggerServerAddress": "127.0.0.1:1234",
-      "hardwareBreakpoints": {
-        "require": true,
-        "limit": 100
-      },
-      "cwd": "${workspaceFolder}/linux-5.15.10",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        },
-        {
-          "description": "disable the user confirm",
-          "text": "set confirm off",
-          "ignoreFailures": true
-        },
-        // {
-        //   "description": "run the gdb debug scripts",
-        //   "text": "source ...",
-        //   "ignoreFailures": false
-        // },
-        {
-          "description": "enable the user confirm",
-          "text": "set confirm on",
-          "ignoreFailures": true
-        },
-      ]
-    }
-  ]
+        // Use IntelliSense to learn about possible attributes.
+        // Hover to view descriptions of existing attributes.
+        // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+        "version": "0.2.0",
+        "configurations": [
+                {
+                        "name": "QEMU_GDB",
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "program": "${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl1/bl1.elf",
+                        "stopAtConnect": true,
+                        "serverLaunchTimeout": 100000000,
+                        "cwd": "${fileDirname}",
+                        "environment": [],
+                        "preLaunchTask": "run_qemu",
+                        "MIMode": "gdb",
+                        "targetArchitecture": "arm64",
+                        "miDebuggerPath": "/usr/bin/gdb-multiarch",
+                        "miDebuggerServerAddress": "localhost:1234",
+                        // "hardwareBreakpoints": {
+                        //         "require": true,
+                        //         "limit": 100
+                        // },
+                        "externalConsole": false,
+                        "setupCommands": [
+                                // {
+                                //         "description": "Enable pretty-printing for gdb",
+                                //         "text": "-enable-pretty-printing",
+                                //         "ignoreFailures": true
+                                // },
+                                // {
+                                //         "description": "add bl1",
+                                //         "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl1/bl1.elf",
+                                //         "ignoreFailures": true
+                                // },
+                                {
+                                        "description": "add bl2",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl2/bl2.elf",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add bl31",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/arm-trusted-firmware/build/qemu_sbsa/debug/bl31/bl31.elf",
+                                        "ignoreFailures": true
+                                },
+                                {
+                                        "description": "add NonDiscoverablePciDeviceDxe",
+                                        "text": "add-symbol-file -readnow ${workspaceFolder}/Build/SbsaQemu/DEBUG_GCC5/AARCH64/MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe/DEBUG/NonDiscoverablePciDeviceDxe.dll 0x1003B75D000",
+                                        "ignoreFailures": true
+                                },
+                                // {
+                                //         "description": "source efi_gdb.py",
+                                //         "text": "source ${workspaceFolder}/edk2/BaseTools/Scripts/efi_gdb.py",
+                                //         "ignoreFailures": true
+                                // },
+                        ]
+                },
+                {
+                        "name": "Kernel_QEMU_GDB",
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "program": "${workspaceFolder}/build/linux-5.15.10/vmlinux",
+                        "stopAtEntry": true,
+                        "MIMode": "gdb",
+                        "preLaunchTask": "Kernel_Run_QEMU",
+                        "miDebuggerPath": "/usr/bin/gdb-multiarch",
+                        "miDebuggerServerAddress": "127.0.0.1:1234",
+                        "hardwareBreakpoints": {
+                          "require": true,
+                          "limit": 100
+                        },
+                        "cwd": "${workspaceFolder}/linux-5.15.10",
+                        "setupCommands": [
+                          {
+                            "description": "Enable pretty-printing for gdb",
+                            "text": "-enable-pretty-printing",
+                            "ignoreFailures": true
+                          },
+                          {
+                            "description": "disable the user confirm",
+                            "text": "set confirm off",
+                            "ignoreFailures": true
+                          },
+                          // {
+                          //   "description": "run the gdb debug scripts",
+                          //   "text": "source ...",
+                          //   "ignoreFailures": false
+                          // },
+                          {
+                            "description": "enable the user confirm",
+                            "text": "set confirm on",
+                            "ignoreFailures": true
+                          }
+                        ]
+                      },
+        ]
 }

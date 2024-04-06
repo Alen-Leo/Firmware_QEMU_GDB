@@ -30,6 +30,18 @@
                     }
                 },
             }
-        }
+        },
+        {
+            "type": "shell",
+            "command": "./build.sh run",
+            "group": {
+                    "kind": "build",
+                    "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "run_qemu",
+            "detail": "run qemu",
+            "isBackground": true
+        },
     ]
 }
