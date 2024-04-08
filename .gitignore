@@ -2,3 +2,6 @@ Build/
 *.fd
 *.log
 edk2/BaseTools/Conf/*
+.vscode/settings.json
+edk2-non-osi/Platform/Qemu/Sbsa/bl1.bin
+edk2-non-osi/Platform/Qemu/Sbsa/fip.bin
