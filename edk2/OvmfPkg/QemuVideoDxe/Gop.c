@@ -8,6 +8,32 @@
 **/
 
 #include "Qemu.h"
+#include <PiDxe.h>
+#include <Library/DxeServicesTableLib.h>
+
+/**
+  Adjusts Frame Buffer Attributes to Normal
+
+
+  @param  Base            The starting physical address of the target frame buffer.
+  @param  Length          The length of the frame buffer in bytes.
+
+  @return An EFI_STATUS code indicating the outcome of the operation. 
+  EFI_SUCCESS is returned if the operation succeeds; otherwise, an appropriate error code is returned.
+*/
+EFI_STATUS AdjustFrameBufferAttributesToNormal (
+  PHYSICAL_ADDRESS    Base,
+  UINT64              Length
+)
+{ 
+  EFI_STATUS Status;
+
+  Status = gDS->FreeMemorySpace(Base, Length);
+  Status = gDS->RemoveMemorySpace(Base, Length); 
+  Status = gDS->AddMemorySpace(EfiGcdMemoryTypeReserved, Base, Length, EFI_MEMORY_WC);
+  Status = gDS->SetMemorySpaceAttributes(Base, Length, EFI_MEMORY_WC);
+  return Status;
+}
 
 STATIC
 VOID
@@ -78,7 +104,7 @@ QemuVideoCompleteModeData (
     Mode->FrameBufferBase,
     (UINT64)Mode->FrameBufferSize
     ));
-
+  AdjustFrameBufferAttributesToNormal(Mode->FrameBufferBase, Mode->FrameBufferSize);
   FreePool (FrameBufDesc);
   return EFI_SUCCESS;
 }
